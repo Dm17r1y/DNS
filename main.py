@@ -15,7 +15,7 @@ def main():
 
             for response in responses:
                 print("Response:")
-                print("id: {}, flags: {}, questions: {}, answers: {}, " 
+                print("id: {}, flags: {}, questions: {}, answers: {}, "
                       "authority: {}, additional: {}".format(
                           response.id, str(response.flags),
                           len(response.questions),
