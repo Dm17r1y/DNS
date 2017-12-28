@@ -28,6 +28,7 @@ class RecordType(Enum):
     CanonicName = 5
     Pointer = 12
     MailExchanger = 15
+    ServerOfAuthority = 6
 
     def __str__(self):
         tags = {
@@ -37,6 +38,7 @@ class RecordType(Enum):
             RecordType.CanonicName: "CNAME",
             RecordType.Pointer: "PTR",
             RecordType.MailExchanger: "MX",
+            RecordType.ServerOfAuthority: "SOA"
         }
         return tags[self]
 
@@ -133,10 +135,11 @@ class Query:
             return "[type: {}, opcode: {}, is authority: {}, truncated: {}, " \
                    "recursion desired: {}, recursion available: {}, " \
                    "reply code: {}]".format(
-                self.type.value, self.opcode.value, self.authority_answer,
-                self.truncated, self.recursion_desired,
-                self.recursion_available, self.reply_code.value
-            )
+                        self.type.value, self.opcode.value,
+                        self.authority_answer,
+                        self.truncated, self.recursion_desired,
+                        self.recursion_available, self.reply_code.value
+                    )
 
         @staticmethod
         def get_flags(query_type, recursion_desired):

@@ -17,10 +17,11 @@ def main():
                 print("Response:")
                 print("id: {}, flags: {}, questions: {}, answers: {}, " 
                       "authority: {}, additional: {}".format(
-                    response.id, str(response.flags), len(response.questions),
-                    len(response.answers), len(response.authorities),
-                    len(response.additional)
-                ))
+                          response.id, str(response.flags),
+                          len(response.questions),
+                          len(response.answers), len(response.authorities),
+                          len(response.additional)
+                      ))
                 print("Questions:")
                 for question in response.questions:
                     print(question)
@@ -33,7 +34,6 @@ def main():
                 print("Additional:")
                 for additional in response.additional:
                     print(additional)
-
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--do_recursive', action='store_true')

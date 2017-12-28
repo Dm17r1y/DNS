@@ -36,6 +36,7 @@ class Domain:
         return self.name + ': [' + ", ".join(str(addr)
                                              for addr in self.addresses) + ']'
 
+
 class EmptyDebugClass:
 
     def send_debug_function(self, address):
@@ -66,7 +67,7 @@ class DNS:
         responses = self.get_response()
         answers, authorities, additional = self._parse_responses(responses)
         while len(answers) == 0:
-            ips = self._get_ips(authorities, additional, domain)
+            ips = self._get_ips(authorities, additional, domain, record_type)
             server_address = random.choice(ips)
             self._send_query(query, server_address)
             responses = self.get_response()
@@ -91,7 +92,7 @@ class DNS:
         return record_type == RecordType.Ipv4 or \
                (record_type == RecordType.Ipv6 and ALLOW_IPV6)
 
-    def _get_ips(self, authorities, additional, domain):
+    def _get_ips(self, authorities, additional, domain, record_type):
 
         def is_authoritative_domain(domain, name):
             domain_parts = domain.split(".")
@@ -120,6 +121,10 @@ class DNS:
                                                 domain)
 
         if len(ips) == 0:
+            if len(names) == 0:
+                raise Exception("{} has no {} record".format(
+                    domain, record_type
+                ))
             domain_name = random.choice(list(names))
             answers = self.get_answers(domain_name, RecordType.Ipv4)
             ips = [answer.data for answer in answers
