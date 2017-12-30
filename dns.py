@@ -48,11 +48,36 @@ class EmptyDebugClass:
 
 class DNS:
 
+    class Socket:
+        def __init__(self, tcp_mode, timeout):
+            self._tcp_mode = tcp_mode
+            self._timeout = timeout
+            if tcp_mode:
+                self._socket = None
+            else:
+                self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                self._socket.settimeout(timeout)
+
+        def send(self, raw_data, address, port):
+            if self._tcp_mode:
+                self._socket = socket.socket()
+                self._socket.settimeout(self._timeout)
+                self._socket.connect((address, port))
+                raw_data = struct.pack("!H", len(raw_data)) + raw_data
+                self._socket.send(raw_data)
+            else:
+                self._socket.sendto(raw_data, (address, port))
+
+        def recv(self):
+            data = self._socket.recv(1000)
+            if self._tcp_mode:
+                return data[2:]
+            return data
+
     def __init__(self, root_server=None, port=UDP_PORT,
                  is_recursion_desired=False, timeout=DEFAULT_TIMEOUT,
-                 debug_class=None):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.settimeout(DEFAULT_TIMEOUT)
+                 debug_class=None, tcp=False):
+        self.socket = DNS.Socket(tcp, timeout)
         self.root_server = root_server if root_server \
             else random.choice(dns_root_servers)
         self.port = port
@@ -135,15 +160,15 @@ class DNS:
     def _send_query(self, query, address):
         query_bytes = query.get_raw_bytes()
         self.debug_class.send_debug_function(str(address))
-        self.socket.sendto(query_bytes, (str(address), self.port))
+        self.socket.send(query_bytes, str(address), self.port)
 
     def get_response(self):
         queries = []
-        data = self.socket.recv(1000)
+        data = self.socket.recv()
         query = Query.get_query_information(data)
         queries.append(query)
         while query.flags.truncated:
-            data = self.socket.recv(1000)
+            data = self.socket.recv()
             query = Query.get_query_information(data)
             queries.append(query)
         self.debug_class.recv_debug_function(queries)

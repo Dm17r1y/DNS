@@ -38,6 +38,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--do_recursive', action='store_true')
     parser.add_argument('--debug', action='store_true')
+    parser.add_argument('--tcp', action='store_true')
     parser.add_argument('-type', action='store', dest='type', default="A",
                         choices=["A", "AAAA", "MX", "NS"])
     parser.add_argument('-timeout', action='store', dest='timeout',
@@ -50,7 +51,7 @@ def main():
     dns_class = dns.DNS(is_recursion_desired=arguments.do_recursive,
                         root_server=arguments.server,
                         port=arguments.port, timeout=arguments.timeout,
-                        debug_class=debug)
+                        debug_class=debug, tcp=arguments.tcp)
     record_types = {
         "A": RecordType.Ipv4,
         "AAAA": RecordType.Ipv6,
