@@ -69,10 +69,14 @@ class DNS:
                 self._socket.sendto(raw_data, (address, port))
 
         def recv(self):
-            data = self._socket.recv(1000)
             if self._tcp_mode:
-                return data[2:]
-            return data
+                length = struct.unpack("!H", self._socket.recv(2))[0]
+                data = self._socket.recv(1000)
+                while len(data) < length:
+                    data += self._socket.recv(1000)
+                return data
+            else:
+                return self._socket.recv(1000)
 
     def __init__(self, root_server=None, port=UDP_PORT,
                  is_recursion_desired=False, timeout=DEFAULT_TIMEOUT,
